@@ -113,9 +113,10 @@ $('key').value = store.get('key', '');
 const cleanKey = v => v.replace(/[^\x21-\x7e]/g, '');   // drop spaces, newlines and any invisible / non-ASCII characters
 function showKeyInfo() {
   const k = cleanKey($('key').value);
-  const ok = /^sk-ant-api\d\d-/.test(k);
+  const dropped = $('key').value.length - k.length;
+  const ok = /^sk-ant-api\d\d-/.test(k) && dropped === 0;
   $('keyinfo').textContent = !k ? 'No key entered'
-    : `${k.slice(0, 13)}…${k.slice(-4)} · ${k.length} chars` + (ok ? '' : ' · ⚠ should start with sk-ant-api03-');
+    : `${k.slice(0, 13)}…${k.slice(-4)} · ${k.length} chars` + (ok ? '' : dropped ? ` · ⚠ ${dropped} unusual characters removed: key was copied incorrectly` : ' · ⚠ should start with sk-ant-api03-');
 }
 $('key').addEventListener('input', () => { store.set('key', cleanKey($('key').value)); showKeyInfo(); });
 $('showkey').addEventListener('change', e => { $('key').type = e.target.checked ? 'text' : 'password'; });
