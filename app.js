@@ -122,10 +122,12 @@ const fixLook = v => [...v.normalize('NFKC')].map(c => LOOK[c] || c).join('');
 const cleanKey = v => fixLook(v).replace(/[^\x21-\x7e]/g, '');
 function showKeyInfo() {
   const raw = $('key').value, k = cleanKey(raw), fixed = fixLook(raw);
-  const conv = [...raw.normalize('NFKC')].filter(c => LOOK[c]).length;        // look-alikes converted
+  const convList = [...raw.normalize('NFKC')].map((c, i) => [c, i]).filter(([c]) => LOOK[c]);   // look-alikes converted
+  const conv = convList.length;
+  const convDetail = convList.map(([c, i]) => `${c.codePointAt(0).toString(16).toUpperCase()}>${LOOK[c]}@${i + 1}`).join(' ');
   const dropped = fixed.length - k.length;                                    // spaces / invisible chars removed
   const ok = /^sk-ant-api\d\d-/.test(k);
-  const notes = [conv ? `${conv} look-alike characters converted` : '', dropped ? `${dropped} stray characters removed` : ''].filter(Boolean).join(', ');
+  const notes = [conv ? `${conv} look-alike characters converted (${convDetail})` : '', dropped ? `${dropped} stray characters removed` : ''].filter(Boolean).join(', ');
   $('keyinfo').textContent = !k ? 'No key entered'
     : `${k.slice(0, 13)}…${k.slice(-4)} · ${k.length} chars` + (notes ? ` · ${notes}` : '') + (ok ? '' : ' · ⚠ should start with sk-ant-api03-');
 }
