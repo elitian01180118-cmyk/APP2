@@ -133,19 +133,47 @@ function showKeyInfo() {
 }
 $('key').addEventListener('input', () => { store.set('key', cleanKey($('key').value)); showKeyInfo(); });
 $('showkey').addEventListener('change', e => { $('key').type = e.target.checked ? 'text' : 'password'; });
+// Some look-alikes are ambiguous (Cyrillic І could have been I or l, О could have been O or 0).
+const ALT = { 'І': ['I', 'l'], 'Ι': ['I', 'l'], 'ӏ': ['l', 'I'], 'О': ['O', '0'], 'Ο': ['O', '0'] };
+function keyCandidates(raw) {
+  let out = [''];
+  for (const c of raw.normalize('NFKC')) {
+    const opts = ALT[c] || [LOOK[c] || c];
+    if (out.length * opts.length > 512) return out.map(k => k + opts[0]);
+    out = out.flatMap(k => opts.map(o => k + o));
+  }
+  return out.map(k => k.replace(/[^\x21-\x7e]/g, ''));
+}
+async function pingKey(key) {
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-api-key': key,
+      'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+    body: JSON.stringify({ model: MODEL, max_tokens: 16, thinking: { type: 'between_tools' },
+      messages: [{ role: 'user', content: 'hi' }] }),
+  });
+  let msg = ''; if (!r.ok) { try { msg = (await r.json()).error.message; } catch {} }
+  return { status: r.status, msg };
+}
 $('testkey').addEventListener('click', async () => {
-  setStatus('Testing key…');
+  const cands = [...new Set(keyCandidates($('key').value))];
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-api-key': cleanKey($('key').value),
-        'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-      body: JSON.stringify({ model: MODEL, max_tokens: 16, thinking: { type: 'between_tools' },
-        messages: [{ role: 'user', content: 'hi' }] }),
-    });
-    if (r.ok) return setStatus('Key works.');
-    let msg = ''; try { msg = (await r.json()).error.message; } catch {}
-    setStatus(`Rejected (${r.status}): ${msg}`);
+    let last = null;
+    for (let n = 0; n < cands.length; n++) {
+      setStatus(cands.length > 1 ? `Testing key… variant ${n + 1}/${cands.length}` : 'Testing key…');
+      last = await pingKey(cands[n]);
+      if (last.status !== 401) {
+        if (last.status >= 200 && last.status < 300) {
+          if (cands[n] !== cleanKey($('key').value)) {          // an alternative reading was the right one
+            $('key').value = cands[n]; store.set('key', cands[n]); showKeyInfo();
+          }
+          return setStatus('Key works.');
+        }
+        return setStatus(`Key accepted but request failed (${last.status}): ${last.msg}`);
+      }
+    }
+    setStatus(cands.length > 1 ? `Rejected (401): none of ${cands.length} readings of this key worked.`
+      : `Rejected (401): ${last.msg}. No ambiguous characters found, so the key text itself is not valid.`);
   } catch (e) { setStatus(`Network error: ${e.message}`); }
 });
 
