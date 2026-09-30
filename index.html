@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Plan">
+<meta name="theme-color" content="#ffffff">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>Weekly Plan</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <!-- NOW -->
+  <section id="view-now" class="view active">
+    <p class="date" id="date"></p>
+    <p class="clock" id="clock"></p>
+    <div class="now">
+      <p class="label">NOW</p>
+      <h1 id="now-title"></h1>
+      <p class="sub" id="now-sub"></p>
+      <div class="bar"><i id="bar"></i></div>
+    </div>
+    <div class="next">
+      <p class="label">NEXT</p>
+      <ul id="next-list"></ul>
+    </div>
+    <p class="label today-label">TODAY</p>
+    <ol id="today" class="today"></ol>
+  </section>
+
+  <!-- WEEK -->
+  <section id="view-week" class="view">
+    <h2>Week</h2>
+    <div class="grid-wrap"><table id="grid"></table></div>
+    <p class="hint">Tap a cell to edit</p>
+  </section>
+
+  <!-- IMPORT -->
+  <section id="view-import" class="view">
+    <h2>Import</h2>
+    <p class="hint left">Upload a screenshot of your weekly table. The app reads it and builds this week's plan.</p>
+    <label class="btn primary" for="file">Choose screenshot</label>
+    <input id="file" type="file" accept="image/*" hidden>
+    <img id="preview" alt="">
+    <p id="status" class="status"></p>
+
+    <h3>Claude API Key</h3>
+    <input id="key" type="password" placeholder="sk-ant-…" autocomplete="off">
+    <p class="hint left">Stored only on this phone, used only to read the image.</p>
+
+    <h3>HOURS</h3>
+    <div class="row">
+      <select id="from"></select><span>to</span><select id="to"></select>
+    </div>
+
+    <button id="clear" class="btn">Clear this week</button>
+  </section>
+</main>
+
+<nav>
+  <button data-v="now" class="on">Now</button>
+  <button data-v="week">Week</button>
+  <button data-v="import">Import</button>
+</nav>
+
+<dialog id="dlg">
+  <form method="dialog">
+    <p id="dlg-title" class="label"></p>
+    <input id="dlg-input" placeholder="Empty = clear" autocomplete="off">
+    <div class="row end">
+      <button value="cancel" class="btn">Cancel</button>
+      <button value="ok" class="btn primary">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>
