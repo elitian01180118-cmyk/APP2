@@ -110,7 +110,27 @@ function fillRange() {
 }
 
 $('key').value = store.get('key', '');
-$('key').addEventListener('input', () => store.set('key', $('key').value.replace(/\s+/g, '')));
+const cleanKey = v => v.replace(/[^\x21-\x7e]/g, '');   // drop spaces, newlines and any invisible / non-ASCII characters
+function showKeyInfo() {
+  const k = cleanKey($('key').value);
+  $('keyinfo').textContent = k ? `${k.slice(0, 12)}…${k.slice(-4)} · ${k.length} chars` : 'No key entered';
+}
+$('key').addEventListener('input', () => { store.set('key', cleanKey($('key').value)); showKeyInfo(); });
+$('testkey').addEventListener('click', async () => {
+  setStatus('Testing key…');
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-api-key': cleanKey($('key').value),
+        'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({ model: MODEL, max_tokens: 16, thinking: { type: 'between_tools' },
+        messages: [{ role: 'user', content: 'hi' }] }),
+    });
+    if (r.ok) return setStatus('Key works.');
+    let msg = ''; try { msg = (await r.json()).error.message; } catch {}
+    setStatus(`Rejected (${r.status}): ${msg}`);
+  } catch (e) { setStatus(`Network error: ${e.message}`); }
+});
 
 $('clear').addEventListener('click', () => {
   if (!confirm('Clear this week\'s plan?')) return;
@@ -151,7 +171,7 @@ const COST_CAP = 0.30, STEP_TOKENS = 4096;
 let lastCost = 0;
 
 async function analyze(dataUrl) {
-  const key = $('key').value.replace(/\s+/g, '');
+  const key = cleanKey($('key').value);
   if (!key) throw new Error('Please enter your Claude API key');
   const first = { role: 'user', content: [
     { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: dataUrl.split(',')[1] } },
@@ -238,6 +258,7 @@ document.querySelectorAll('nav button').forEach(b => b.addEventListener('click',
 $('note').value = store.get('note', '');
 $('note').addEventListener('input', () => store.set('note', $('note').value));
 
+showKeyInfo();
 fillRange();
 renderAll();
 setInterval(renderAll, 1000 * 20);
