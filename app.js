@@ -118,6 +118,7 @@ function showKeyInfo() {
     : `${k.slice(0, 13)}…${k.slice(-4)} · ${k.length} chars` + (ok ? '' : ' · ⚠ should start with sk-ant-api03-');
 }
 $('key').addEventListener('input', () => { store.set('key', cleanKey($('key').value)); showKeyInfo(); });
+$('showkey').addEventListener('change', e => { $('key').type = e.target.checked ? 'text' : 'password'; });
 $('testkey').addEventListener('click', async () => {
   setStatus('Testing key…');
   try {
