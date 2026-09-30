@@ -110,16 +110,24 @@ function fillRange() {
 }
 
 $('key').value = store.get('key', '');
-const cleanKey = v => v.replace(/[^\x21-\x7e]/g, '');   // drop spaces, newlines and any invisible / non-ASCII characters
+// Pasted keys sometimes contain look-alike letters (e.g. Cyrillic а, р, З) or stray spaces.
+// Convert known look-alikes back to ASCII, then drop anything that is still not printable ASCII.
+const LOOK = {
+  'а':'a','с':'c','е':'e','о':'o','р':'p','х':'x','у':'y','і':'i','ј':'j','ѕ':'s','ԁ':'d','ԛ':'q','ԝ':'w','ɡ':'g',
+  'А':'A','В':'B','С':'C','Е':'E','Н':'H','І':'I','Ј':'J','К':'K','М':'M','О':'O','Р':'P','Ѕ':'S','Т':'T','Х':'X','У':'Y','З':'3',
+  'Α':'A','Β':'B','Ε':'E','Η':'H','Ι':'I','Κ':'K','Μ':'M','Ν':'N','Ο':'O','Ρ':'P','Τ':'T','Χ':'X','Υ':'Y','Ζ':'Z','ο':'o','ν':'v','ι':'i',
+  '‐':'-','‑':'-','‒':'-','–':'-','—':'-','−':'-',
+};
+const fixLook = v => [...v.normalize('NFKC')].map(c => LOOK[c] || c).join('');
+const cleanKey = v => fixLook(v).replace(/[^\x21-\x7e]/g, '');
 function showKeyInfo() {
-  const k = cleanKey($('key').value);
-  const raw = $('key').value;
-  const dropped = raw.length - k.length;
-  const odd = [...raw].map((c, i) => [c, i]).filter(([c]) => !/[\x21-\x7e]/.test(c))
-    .slice(0, 8).map(([c, i]) => `U+${c.codePointAt(0).toString(16).toUpperCase().padStart(4, '0')}@${i + 1}`).join(' ');
-  const ok = /^sk-ant-api\d\d-/.test(k) && dropped === 0;
+  const raw = $('key').value, k = cleanKey(raw), fixed = fixLook(raw);
+  const conv = [...raw.normalize('NFKC')].filter(c => LOOK[c]).length;        // look-alikes converted
+  const dropped = fixed.length - k.length;                                    // spaces / invisible chars removed
+  const ok = /^sk-ant-api\d\d-/.test(k);
+  const notes = [conv ? `${conv} look-alike characters converted` : '', dropped ? `${dropped} stray characters removed` : ''].filter(Boolean).join(', ');
   $('keyinfo').textContent = !k ? 'No key entered'
-    : `${k.slice(0, 13)}…${k.slice(-4)} · ${k.length} chars` + (ok ? '' : dropped ? ` · ⚠ ${dropped} unusual characters removed (${odd})` : ' · ⚠ should start with sk-ant-api03-');
+    : `${k.slice(0, 13)}…${k.slice(-4)} · ${k.length} chars` + (notes ? ` · ${notes}` : '') + (ok ? '' : ' · ⚠ should start with sk-ant-api03-');
 }
 $('key').addEventListener('input', () => { store.set('key', cleanKey($('key').value)); showKeyInfo(); });
 $('showkey').addEventListener('change', e => { $('key').type = e.target.checked ? 'text' : 'password'; });
