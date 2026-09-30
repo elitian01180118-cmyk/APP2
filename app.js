@@ -4,10 +4,9 @@ const KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const MODEL = 'claude-sonnet-5-5';
 const $ = id => document.getElementById(id);
 
-const NS = 'app2:';                               // keeps this app's data apart from the APP repo's
 const store = {
-  get(k, d) { try { const v = localStorage.getItem(NS + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
-  set(k, v) { try { localStorage.setItem(NS + k, JSON.stringify(v)); } catch {} },
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
 };
 let plan = store.get('plan', {});                 // { mon: { "9": "CA", ... }, ... }
 let range = store.get('range', { from: 9, to: 23 });
