@@ -6,11 +6,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Plan">
+<meta name="apple-mobile-web-app-title" content="Plan Note">
 <meta name="theme-color" content="#ffffff">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<title>Weekly Plan</title>
+<title>Weekly Plan Note</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -60,12 +60,19 @@
 
     <button id="clear" class="btn">Clear this week</button>
   </section>
+
+  <!-- NOTE -->
+  <section id="view-note" class="view">
+    <h2>Note</h2>
+    <textarea id="note" placeholder="Write here…" spellcheck="false"></textarea>
+  </section>
 </main>
 
 <nav>
   <button data-v="now" class="on">Now</button>
   <button data-v="week">Week</button>
   <button data-v="import">Import</button>
+  <button data-v="note">Note</button>
 </nav>
 
 <dialog id="dlg">

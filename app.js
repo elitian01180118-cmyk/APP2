@@ -235,6 +235,9 @@ document.querySelectorAll('nav button').forEach(b => b.addEventListener('click',
   window.scrollTo(0, 0);
 }));
 
+$('note').value = store.get('note', '');
+$('note').addEventListener('input', () => store.set('note', $('note').value));
+
 fillRange();
 renderAll();
 setInterval(renderAll, 1000 * 20);
