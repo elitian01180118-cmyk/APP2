@@ -113,7 +113,9 @@ $('key').value = store.get('key', '');
 const cleanKey = v => v.replace(/[^\x21-\x7e]/g, '');   // drop spaces, newlines and any invisible / non-ASCII characters
 function showKeyInfo() {
   const k = cleanKey($('key').value);
-  $('keyinfo').textContent = k ? `${k.slice(0, 12)}…${k.slice(-4)} · ${k.length} chars` : 'No key entered';
+  const ok = /^sk-ant-api\d\d-/.test(k);
+  $('keyinfo').textContent = !k ? 'No key entered'
+    : `${k.slice(0, 13)}…${k.slice(-4)} · ${k.length} chars` + (ok ? '' : ' · ⚠ should start with sk-ant-api03-');
 }
 $('key').addEventListener('input', () => { store.set('key', cleanKey($('key').value)); showKeyInfo(); });
 $('testkey').addEventListener('click', async () => {
