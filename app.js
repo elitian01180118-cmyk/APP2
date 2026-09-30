@@ -179,7 +179,9 @@ async function analyze(dataUrl) {
   ] };
   let text = '', cost = 0, cap = COST_CAP, messages = [first];
   for (;;) {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
+    let r;
+    try {
+    r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'content-type': 'application/json',
@@ -189,6 +191,7 @@ async function analyze(dataUrl) {
       },
       body: JSON.stringify({ model: MODEL, max_tokens: STEP_TOKENS, thinking: { type: 'between_tools' }, messages }),
     });
+    } catch (e) { throw new Error(`Network error: ${e.message}`); }
     if (!r.ok) {
       let msg = '';
       try { msg = (await r.json()).error.message; } catch {}
@@ -196,6 +199,7 @@ async function analyze(dataUrl) {
         : `Analysis failed (${r.status}) ${msg}`);
     }
     const j = await r.json();
+    if (!j || !Array.isArray(j.content) || !j.usage) throw new Error('Unexpected response: ' + JSON.stringify(j).slice(0, 200));
     cost += j.usage.input_tokens * PRICE_IN + j.usage.output_tokens * PRICE_OUT;
     text += j.content.filter(b => b.type === 'text').map(b => b.text).join('');
     setStatus(`Analyzing… $${cost.toFixed(3)}`);
@@ -239,7 +243,7 @@ $('file').addEventListener('change', async e => {
     renderAll();
     setStatus(`Done: ${hours.length} entries ($${lastCost.toFixed(3)}). Check them in Week.`);
   } catch (err) {
-    setStatus(err.message);
+    setStatus(err.name === 'Error' ? err.message : `${err.name}: ${err.message}`);
   } finally {
     e.target.value = '';
   }
