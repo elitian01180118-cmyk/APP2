@@ -1,4 +1,7 @@
-:root{--fg:#111;--mute:#8a8a8e;--line:#ececec;--bg:#fff;--soft:#f6f6f7}
+:root{--fg:#111;--mute:#8a8a8e;--line:#ececec;--bg:#fff;--soft:#f6f6f7;
+  --faint:#b5b5ba;--strike:#ddd;--ph:#c6c6cb;--navbg:rgba(255,255,255,.92);--shadow:rgba(0,0,0,.18);--dlg:#fff}
+:root[data-theme=dark]{--fg:#f2f2f7;--mute:#8e8e93;--line:#2c2c2e;--bg:#000;--soft:#1c1c1e;
+  --faint:#5c5c61;--strike:#3a3a3c;--ph:#48484a;--navbg:rgba(0,0,0,.88);--shadow:rgba(0,0,0,.6);--dlg:#1c1c1e;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--fg);
   font-family:-apple-system,"SF Pro Text","PingFang TC",sans-serif;-webkit-font-smoothing:antialiased}
@@ -18,10 +21,10 @@ main{padding:calc(env(safe-area-inset-top) + 28px) 24px calc(env(safe-area-inset
 .next li span:last-child{color:var(--mute);font-variant-numeric:tabular-nums}
 .today-label{margin-top:44px}
 .today{list-style:none;margin:0;padding:0}
-.today li{display:flex;gap:16px;padding:9px 0;color:#b5b5ba;font-size:15px}
+.today li{display:flex;gap:16px;padding:9px 0;color:var(--faint);font-size:15px}
 .today li b{font-weight:400;width:44px;font-variant-numeric:tabular-nums}
 .today li.cur{color:var(--fg);font-weight:600}
-.today li.past{text-decoration:line-through;text-decoration-color:#ddd}
+.today li.past{text-decoration:line-through;text-decoration-color:var(--strike)}
 h2{font-size:28px;margin:0 0 24px;font-weight:600}
 h3{font-size:12px;letter-spacing:.12em;color:var(--mute);font-weight:500;margin:36px 0 10px}
 .hint{color:var(--mute);font-size:13px;text-align:center;margin:14px 0}
@@ -32,11 +35,11 @@ th{font-weight:500;color:var(--mute);padding:6px 4px;position:sticky;top:0;backg
 th.today{color:var(--fg)}
 td{border-top:1px solid var(--line);padding:8px 1px;word-break:break-word;line-height:1.2;height:34px;text-align:center;cursor:pointer}
 td.h{color:var(--mute);width:24px;text-align:left;cursor:default}
-td.meal{color:#b5b5ba}
+td.meal{color:var(--faint)}
 td.cur{background:var(--soft);font-weight:600}
 .btn{display:inline-block;border:1px solid var(--line);background:var(--bg);color:var(--fg);
   padding:13px 20px;border-radius:12px;font-size:16px;text-align:center}
-.btn.primary{background:var(--fg);color:#fff;border-color:var(--fg)}
+.btn.primary{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 label.btn{width:100%}
 #clear{width:100%;margin-top:36px;color:#c0392b}
 #preview{display:none;width:100%;margin-top:18px;border:1px solid var(--line);border-radius:10px}
@@ -46,14 +49,16 @@ input,select{font:inherit;font-size:16px;border:1px solid var(--line);border-rad
 .row select{flex:1}.row span{color:var(--mute)}
 nav{position:fixed;left:0;right:0;bottom:0;display:flex;overflow-x:auto;overscroll-behavior-x:contain;
   scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;
-  padding:10px 0 calc(env(safe-area-inset-bottom) + 6px);background:rgba(255,255,255,.92);
+  padding:10px 0 calc(env(safe-area-inset-bottom) + 6px);background:var(--navbg);
   backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--line)}
 nav::-webkit-scrollbar{display:none}
 nav button{flex:0 0 33.3334%;scroll-snap-align:start;background:none;border:0;font-size:15px;color:var(--mute);padding:8px 0}
 nav button.on{color:var(--fg);font-weight:600}
-dialog{border:0;border-radius:18px;padding:22px;width:min(88vw,360px);box-shadow:0 10px 40px rgba(0,0,0,.18)}
+dialog{border:0;border-radius:18px;padding:22px;width:min(88vw,360px);box-shadow:0 10px 40px var(--shadow);background:var(--dlg);color:var(--fg)}
 dialog::backdrop{background:rgba(0,0,0,.25)}
 dialog form{margin:0}
 #note{display:block;width:100%;min-height:calc(100vh - 230px);border:0;outline:0;resize:none;background:transparent;
   color:var(--fg);font:inherit;font-size:17px;line-height:1.7;padding:0}
-#note::placeholder{color:#c6c6cb}
+#note::placeholder{color:var(--ph)}
+#note-title{background:none;border:0;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.row .btn.seg{flex:1}

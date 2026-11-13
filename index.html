@@ -7,11 +7,12 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="GridNow">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" id="themecolor" content="#ffffff">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <title>GridNow</title>
 <link rel="stylesheet" href="style.css">
+<script>try{if(JSON.parse(localStorage.getItem('theme'))==='dark')document.documentElement.dataset.theme='dark'}catch(e){}</script>
 </head>
 <body>
 <main>
@@ -61,12 +62,18 @@
       <select id="from"></select><span>to</span><select id="to"></select>
     </div>
 
+    <h3>APPEARANCE</h3>
+    <div class="row">
+      <button class="btn seg" data-theme="light" type="button">Light</button>
+      <button class="btn seg" data-theme="dark" type="button">Dark</button>
+    </div>
+
     <button id="clear" class="btn">Clear this week</button>
   </section>
 
   <!-- NOTE -->
   <section id="view-note" class="view">
-    <h2>Note</h2>
+    <h2><button id="note-title" type="button"></button></h2>
     <textarea id="note" placeholder="Write here…" spellcheck="false"></textarea>
   </section>
 </main>
@@ -89,6 +96,6 @@
   </form>
 </dialog>
 
-<script src="app.js?v=4"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>
